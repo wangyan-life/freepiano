@@ -1,0 +1,39 @@
+name: Quick Windows Build
+
+on:
+  push:
+    branches: [ main, ci/fix-mp4v2-snprintf-guard ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-win:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Setup MSBuild path
+        run: |
+          echo "Finding msbuild via vswhere..."
+          $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
+          if (Test-Path $vswhere) {
+            $inst = & $vswhere -latest -products * -requires Microsoft.Component.MSBuild -property installationPath
+            Write-Host "VS Path: $inst"
+            $msbuild = Join-Path $inst "MSBuild\Current\Bin\MSBuild.exe"
+            Write-Host "MSBuild: $msbuild"
+            echo "MSBUILD_PATH=$msbuild" | Out-File -FilePath $env:GITHUB_ENV -Encoding ASCII -Append
+          } else {
+            Write-Error "vswhere not found"
+            exit 1
+          }
+        shell: powershell
+
+      - name: Build minimal solution (Release|Win32)
+        run: |
+          $msb = "$Env:MSBUILD_PATH"
+          if (-not (Test-Path $msb)) { Write-Error "msbuild not found at $msb"; exit 1 }
+          & $msb "${{ github.workspace }}\vc\freepiano_minimal.vcxproj" /t:Build /p:Configuration=Release /p:Platform=Win32 /m
+        shell: powershell
