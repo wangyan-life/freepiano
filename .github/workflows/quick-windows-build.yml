@@ -38,9 +38,18 @@ jobs:
           & $msb "${{ github.workspace }}\vc\freepiano_minimal.vcxproj" /t:Build /p:Configuration=Release /p:Platform=x64 /m
         shell: powershell
 
+      - name: List build outputs (debug)
+        if: success()
+        run: |
+          Write-Host "Listing any freepiano_minimal.dll under vc folder:" 
+          Get-ChildItem -Path "${{ github.workspace }}\vc" -Recurse -Filter "freepiano_minimal.dll" -ErrorAction SilentlyContinue | ForEach-Object { Write-Host $_.FullName }
+        shell: powershell
+
       - name: Upload built DLL
         if: success()
         uses: actions/upload-artifact@v4
         with:
           name: freepiano_minimal_dll
-          path: vc\Release\freepiano_minimal.dll
+          # Use glob so any platform/config output path (x64/Release, Release\x64, etc.) is matched
+          path: |
+            vc/**/freepiano_minimal.dll
