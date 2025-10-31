@@ -3,3 +3,13 @@ D:\Codes\git\freepiano\demos\csharp\WasapiDemo\obj\Debug\net6.0\WasapiDemo.Gener
 D:\Codes\git\freepiano\demos\csharp\WasapiDemo\obj\Debug\net6.0\WasapiDemo.AssemblyInfoInputs.cache
 D:\Codes\git\freepiano\demos\csharp\WasapiDemo\obj\Debug\net6.0\WasapiDemo.AssemblyInfo.cs
 D:\Codes\git\freepiano\demos\csharp\WasapiDemo\obj\Debug\net6.0\WasapiDemo.csproj.CoreCompileInputs.cache
+D:\Codes\git\freepiano\demos\csharp\WasapiDemo\bin\Debug\net6.0\WasapiDemo.exe
+D:\Codes\git\freepiano\demos\csharp\WasapiDemo\bin\Debug\net6.0\WasapiDemo.deps.json
+D:\Codes\git\freepiano\demos\csharp\WasapiDemo\bin\Debug\net6.0\WasapiDemo.runtimeconfig.json
+D:\Codes\git\freepiano\demos\csharp\WasapiDemo\bin\Debug\net6.0\WasapiDemo.dll
+D:\Codes\git\freepiano\demos\csharp\WasapiDemo\bin\Debug\net6.0\ref\WasapiDemo.dll
+D:\Codes\git\freepiano\demos\csharp\WasapiDemo\bin\Debug\net6.0\WasapiDemo.pdb
+D:\Codes\git\freepiano\demos\csharp\WasapiDemo\obj\Debug\net6.0\WasapiDemo.dll
+D:\Codes\git\freepiano\demos\csharp\WasapiDemo\obj\Debug\net6.0\ref\WasapiDemo.dll
+D:\Codes\git\freepiano\demos\csharp\WasapiDemo\obj\Debug\net6.0\WasapiDemo.pdb
+D:\Codes\git\freepiano\demos\csharp\WasapiDemo\obj\Debug\net6.0\WasapiDemo.genruntimeconfig.cache

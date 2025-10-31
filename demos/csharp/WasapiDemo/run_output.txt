@@ -1,4 +1,4 @@
-D:\Codes\git\freepiano\demos\csharp\WasapiDemo\Program.cs(8,33): error CS0227: 不安全代码只会在使用 /unsafe 编译的情况下出现 [D:\Codes\git\freepiano\demos\csharp\WasapiDemo\WasapiDemo.csproj]
-D:\Codes\git\freepiano\demos\csharp\WasapiDemo\Program.cs(26,24): error CS0227: 不安全代码只会在使用 /unsafe 编译的情况下出现 [D:\Codes\git\freepiano\demos\csharp\WasapiDemo\WasapiDemo.csproj]
-
-生成失败。请修复生成错误并重新运行。
+WasapiDemo starting
+Unhandled exception. System.BadImageFormatException: 试图加载格式不正确的程序。 (0x8007000B)
+   at Native.fp_init()
+   at Program.Main() in D:\Codes\git\freepiano\demos\csharp\WasapiDemo\Program.cs:line 56
