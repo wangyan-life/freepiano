@@ -37,3 +37,10 @@ jobs:
           if (-not (Test-Path $msb)) { Write-Error "msbuild not found at $msb"; exit 1 }
           & $msb "${{ github.workspace }}\vc\freepiano_minimal.vcxproj" /t:Build /p:Configuration=Release /p:Platform=Win32 /m
         shell: powershell
+
+      - name: Upload built DLL
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: freepiano_minimal_dll
+          path: vc\Release\freepiano_minimal.dll

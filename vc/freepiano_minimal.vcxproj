@@ -70,4 +70,13 @@
   </ItemGroup>
 
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+
+  <!-- After build, copy DLL to demo output folder to make it easy to run the C# demo locally -->
+  <Target Name="PostBuildCopy" AfterTargets="Build">
+    <PropertyGroup>
+      <DemoOutDir>$(ProjectDir)..\demos\csharp\WasapiDemo\bin\Debug\net6.0\</DemoOutDir>
+    </PropertyGroup>
+    <MakeDir Directories="$(DemoOutDir)" Condition="!Exists('$(DemoOutDir)')" />
+    <Copy SourceFiles="$(TargetPath)" DestinationFiles="$(DemoOutDir)$(TargetFileName)" SkipUnchangedFiles="true" />
+  </Target>
 </Project>
