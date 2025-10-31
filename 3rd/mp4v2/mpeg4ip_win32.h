@@ -55,8 +55,14 @@ typedef unsigned short in_port_t;
 typedef int socklen_t;
 typedef int ssize_t;
 typedef unsigned int uint;
+/*
+ * Modern MSVC (with UCRT, _MSC_VER >= 1900) provides snprintf in the C runtime.
+ * Only provide a fallback implementation when targeting older MSVC toolchains
+ * that lack snprintf to avoid redefinition conflicts with ucrt's declaration.
+ */
+#if defined(_MSC_VER) && _MSC_VER < 1900
 static inline int snprintf(char *buffer, size_t count,
-			  const char *format, ...) {
+              const char *format, ...) {
   va_list ap;
   int ret;
   va_start(ap, format);
@@ -68,6 +74,7 @@ static inline int snprintf(char *buffer, size_t count,
   }
   return ret;
 }
+#endif
 #define strncasecmp _strnicmp
 #define strcasecmp _stricmp
 #define localtime_r(a,b) localtime_s(b,a)
