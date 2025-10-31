@@ -2,7 +2,7 @@ name: Quick Windows Build
 
 on:
   push:
-    branches: [ main, ci/fix-mp4v2-snprintf-guard ]
+    branches: [ main, ci/fix-mp4v2-snprintf-guard, rebuild/minimal-wasapi ]
   pull_request:
     branches: [ main ]
 
@@ -31,11 +31,11 @@ jobs:
           }
         shell: powershell
 
-      - name: Build minimal solution (Release|Win32)
+      - name: Build minimal solution (Release|x64)
         run: |
           $msb = "$Env:MSBUILD_PATH"
           if (-not (Test-Path $msb)) { Write-Error "msbuild not found at $msb"; exit 1 }
-          & $msb "${{ github.workspace }}\vc\freepiano_minimal.vcxproj" /t:Build /p:Configuration=Release /p:Platform=Win32 /m
+          & $msb "${{ github.workspace }}\vc\freepiano_minimal.vcxproj" /t:Build /p:Configuration=Release /p:Platform=x64 /m
         shell: powershell
 
       - name: Upload built DLL
