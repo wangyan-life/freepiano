@@ -35,7 +35,12 @@ jobs:
         run: |
           $msb = "$Env:MSBUILD_PATH"
           if (-not (Test-Path $msb)) { Write-Error "msbuild not found at $msb"; exit 1 }
-          & $msb "${{ github.workspace }}\vc\freepiano_minimal.vcxproj" /t:Build /p:Configuration=Release /p:Platform=x64 /m
+          Write-Host "MSBuild: $msb"
+          # Run MSBuild and capture stdout/stderr to msbuild.log for debugging
+          & $msb "${{ github.workspace }}\vc\freepiano_minimal.vcxproj" /t:Build /p:Configuration=Release /p:Platform=x64 /m > msbuild.log 2>&1
+          # dump a short preview in the job log to help quick inspection
+          Write-Host '---- MSBuild log (first 200 lines) ----'
+          Get-Content msbuild.log -TotalCount 200 | ForEach-Object { Write-Host $_ }
         shell: powershell
 
       - name: List build outputs (debug)
@@ -53,3 +58,10 @@ jobs:
           # Use glob so any platform/config output path (x64/Release, Release\x64, etc.) is matched
           path: |
             vc/**/freepiano_minimal.dll
+
+      - name: Upload build log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: freepiano_msbuild_log
+          path: msbuild.log
