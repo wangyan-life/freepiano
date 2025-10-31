@@ -1,4 +1,3 @@
 WasapiDemo starting
-Unhandled exception. System.BadImageFormatException: 试图加载格式不正确的程序。 (0x8007000B)
-   at Native.fp_init()
-   at Program.Main() in D:\Codes\git\freepiano\demos\csharp\WasapiDemo\Program.cs:line 56
+Streaming for 5 seconds...
+Stopped
