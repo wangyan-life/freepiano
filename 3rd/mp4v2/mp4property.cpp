@@ -214,13 +214,15 @@ void MP4Integer64Property::Dump(FILE* pFile, u_int8_t indent,
 		return;
 	}
 	Indent(pFile, indent);
-	if (index != 0) 
-	  fprintf(pFile, "%s[%u] = "U64" (0x%016"X64F")\n", 
-		  m_name, index, m_values[index], m_values[index]);
-	else
-	  fprintf(pFile, 
-		  "%s = "U64" (0x%016"X64F")\n", 
-		  m_name, m_values[index], m_values[index]);
+	if (index != 0) {
+	  /* Use MSVC-friendly I64 format explicitly to avoid C++ user-literal
+		 concatenation issues with macroized format fragments. */
+	  fprintf(pFile, "%s[%u] = %I64u (0x%016I64x)\n", 
+		  m_name, index, (unsigned long long)m_values[index], (unsigned long long)m_values[index]);
+	} else {
+	  fprintf(pFile, "%s = %I64u (0x%016I64x)\n", 
+		  m_name, (unsigned long long)m_values[index], (unsigned long long)m_values[index]);
+	}
 	fflush(pFile);
 }
 
@@ -254,14 +256,15 @@ void MP4BitfieldProperty::Dump(FILE* pFile, u_int8_t indent,
 	if (hexWidth == 0 || (m_numBits % 4)) {
 		hexWidth++;
 	}
-	if (index != 0) 
-	fprintf(pFile, 
-		"%s[%u] = "U64" (0x%0*"X64F") <%u bits>\n", 
-		m_name, index, m_values[index], (int)hexWidth, m_values[index], m_numBits);
-	else 
-	  fprintf(pFile, 
-		  "%s = "U64" (0x%0*"X64F") <%u bits>\n", 
-		  m_name, m_values[index], (int)hexWidth, m_values[index], m_numBits);
+	if (index != 0) {
+	fprintf(pFile,
+		"%s[%u] = %I64u (0x%0*I64x) <%u bits>\n",
+		m_name, index, (unsigned long long)m_values[index], (int)hexWidth, (unsigned long long)m_values[index], m_numBits);
+	} else {
+	  fprintf(pFile,
+		  "%s = %I64u (0x%0*I64x) <%u bits>\n",
+		  m_name, (unsigned long long)m_values[index], (int)hexWidth, (unsigned long long)m_values[index], m_numBits);
+	}
 	fflush(pFile);
 }
 
