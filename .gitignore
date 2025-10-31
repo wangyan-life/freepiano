@@ -1,5 +1,6 @@
 vc/Debug
 vc/Release
+*.cache
 *.sdf
 *.user
 *.opensdf

@@ -1,0 +1,5 @@
+D:\Codes\git\freepiano\demos\csharp\WasapiDemo\obj\Debug\net6.0\WasapiDemo.csproj.AssemblyReference.cache
+D:\Codes\git\freepiano\demos\csharp\WasapiDemo\obj\Debug\net6.0\WasapiDemo.GeneratedMSBuildEditorConfig.editorconfig
+D:\Codes\git\freepiano\demos\csharp\WasapiDemo\obj\Debug\net6.0\WasapiDemo.AssemblyInfoInputs.cache
+D:\Codes\git\freepiano\demos\csharp\WasapiDemo\obj\Debug\net6.0\WasapiDemo.AssemblyInfo.cs
+D:\Codes\git\freepiano\demos\csharp\WasapiDemo\obj\Debug\net6.0\WasapiDemo.csproj.CoreCompileInputs.cache
