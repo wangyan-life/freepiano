@@ -11,6 +11,9 @@
 #include <cassert>
 #include <memory>
 #include <type_traits>
+#if defined(_WIN32)
+#include <malloc.h> // _aligned_malloc/_aligned_free
+#endif
 
 namespace fp {
 
@@ -23,14 +26,33 @@ public:
         assert(capacity_pow2 >= 2 && (capacity_pow2 & (capacity_pow2 - 1)) == 0);
         capacity = capacity_pow2;
         mask = capacity - 1;
-        buffer = static_cast<T*>(::operator new[](sizeof(T) * capacity));
+    // allocate 64-byte aligned buffer to avoid false-sharing and satisfy alignas(64)
+    const size_t bytes = sizeof(T) * capacity;
+#if defined(_WIN32)
+    buffer = static_cast<T*>(_aligned_malloc(bytes, 64));
+    assert(buffer != nullptr && "_aligned_malloc failed");
+#else
+    // POSIX aligned allocation (C11) if available
+    void* p = nullptr;
+#  if defined(_ISOC11_SOURCE)
+    p = aligned_alloc(64, bytes);
+#  else
+    if (posix_memalign(&p, 64, bytes) != 0) p = nullptr;
+#  endif
+    buffer = static_cast<T*>(p);
+    assert(buffer != nullptr && "aligned allocation failed");
+#endif
         head.store(0, std::memory_order_relaxed);
         tail.store(0, std::memory_order_relaxed);
     }
 
     ~SpscRing()
     {
-        ::operator delete[](buffer);
+#if defined(_WIN32)
+    _aligned_free(buffer);
+#else
+    free(buffer);
+#endif
     }
 
     // non-copyable
