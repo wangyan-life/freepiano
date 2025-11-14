@@ -26,9 +26,9 @@ class Program
 
     static void SineCallback(IntPtr interleavedPtr, UIntPtr frames, IntPtr user)
     {
-        int ch = 2;
-        int sampleRate = 48000;
-        double freq = 440.0;
+    int ch = 2;
+    int sampleRate = 44100; // match common device mix format and recorded WAV
+    double freq = 440.0;
         int frameCount = (int)frames;
 
         // use managed static phase to avoid unsafe pointer usage
@@ -37,7 +37,7 @@ class Program
         float[] buffer = new float[frameCount * ch];
         for (int i = 0; i < frameCount; ++i)
         {
-            float sample = (float)(Math.Sin(_phase) * 0.2);
+            float sample = (float)(Math.Sin(_phase) * 0.1); // lower amplitude to avoid clipping
             _phase += 2.0 * Math.PI * freq / sampleRate;
             if (_phase > 2.0 * Math.PI) _phase -= 2.0 * Math.PI;
             for (int c = 0; c < ch; ++c)
