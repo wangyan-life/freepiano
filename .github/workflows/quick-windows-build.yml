@@ -2,9 +2,10 @@ name: Quick Windows Build
 
 on:
   push:
-    branches: [ main, ci/fix-mp4v2-snprintf-guard, rebuild/minimal-wasapi ]
+    branches: [ main, ci/fix-mp4v2-snprintf-guard, rebuild/minimal-wasapi, sound-diagnostics ]
   pull_request:
     branches: [ main ]
+  workflow_dispatch: {}
 
 jobs:
   build-win:
