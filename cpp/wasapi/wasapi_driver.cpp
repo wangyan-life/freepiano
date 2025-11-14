@@ -6,6 +6,7 @@
 #include <comdef.h>
 #include <iostream>
 #include <vector>
+#include <chrono>
 
 #pragma comment(lib, "ole32.lib")
 #pragma comment(lib, "avrt.lib")
@@ -213,20 +214,52 @@ DWORD WasapiDriver::render_thread()
 
     std::vector<float> mixbuf(framesPerIteration * channels);
 
+    // Diagnostic summary
+    std::cout << "WASAPI DIAGNOSTICS: bufferFrameCount=" << bufferFrameCount
+              << " framesPerIteration=" << framesPerIteration
+              << " channels=" << channels
+              << " sampleRate=" << sampleRate
+              << " bitsPerSample=" << pwfx->wBitsPerSample
+              << " formatTag=" << pwfx->wFormatTag
+              << std::endl;
+
     hr = audioClient->Start();
     if (FAILED(hr)) {
         std::cerr << "audioClient Start failed: " << std::hex << hr << std::endl;
     }
 
     // render loop - wait on event and write silence or callback output
+    size_t iter = 0;
+    size_t underrun_count = 0;
+    auto last_wake = std::chrono::high_resolution_clock::now();
     while (running) {
+        auto before_wait = std::chrono::high_resolution_clock::now();
         DWORD wait = WaitForSingleObject(hEvent, 2000);
+        auto after_wait = std::chrono::high_resolution_clock::now();
+        auto wait_ms = std::chrono::duration_cast<std::chrono::milliseconds>(after_wait - before_wait).count();
         if (wait == WAIT_TIMEOUT) {
-            // continue
+            std::cerr << "WASAPI WARNING: WaitForSingleObject timeout" << std::endl;
         }
+        // measure time since last wake
+        auto since_last = std::chrono::duration_cast<std::chrono::milliseconds>(after_wait - last_wake).count();
+        last_wake = after_wait;
+
         UINT32 padding = 0;
         hr = audioClient->GetCurrentPadding(&padding);
-        UINT32 framesAvailable = bufferFrameCount - padding;
+        UINT32 framesAvailable = (bufferFrameCount > padding) ? (bufferFrameCount - padding) : 0;
+        if (FAILED(hr)) {
+            std::cerr << "GetCurrentPadding failed: " << std::hex << hr << std::endl;
+        }
+        // periodic log
+        if ((iter % 100) == 0) {
+            std::cout << "WASAPI TRACE: iter=" << iter
+                      << " wait_ms=" << wait_ms
+                      << " since_last_ms=" << since_last
+                      << " padding=" << padding
+                      << " framesAvailable=" << framesAvailable
+                      << std::endl;
+        }
+
         while (framesAvailable >= framesPerIteration) {
             BYTE* pData = nullptr;
             hr = renderClient->GetBuffer(framesPerIteration, &pData);
@@ -246,10 +279,21 @@ DWORD WasapiDriver::render_thread()
             }
 
             hr = renderClient->ReleaseBuffer(framesPerIteration, 0);
-            if (FAILED(hr)) break;
+            if (FAILED(hr)) {
+                std::cerr << "ReleaseBuffer failed: " << std::hex << hr << std::endl;
+                break;
+            }
 
             hr = audioClient->GetCurrentPadding(&padding);
-            framesAvailable = bufferFrameCount - padding;
+            framesAvailable = (bufferFrameCount > padding) ? (bufferFrameCount - padding) : 0;
+            if (framesAvailable < framesPerIteration) {
+                // underrun: not enough frames available for next write
+                underrun_count++;
+                if ((underrun_count % 10) == 0) {
+                    std::cerr << "WASAPI UNDERRUN: count=" << underrun_count << " iter=" << iter << " framesAvailable=" << framesAvailable << std::endl;
+                }
+            }
+            iter++;
         }
     }
 
