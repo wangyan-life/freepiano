@@ -2,6 +2,7 @@
 #include <mmdeviceapi.h>
 #include <audioclient.h>
 #include <avrt.h>
+#include <mmreg.h>
 #include <comdef.h>
 #include <iostream>
 #include <vector>
@@ -110,6 +111,25 @@ DWORD WasapiDriver::render_thread()
         CoUninitialize();
         running = false;
         return 1;
+    }
+
+    // Diagnostic: print the mix format obtained from the device
+    std::cout << "WASAPI MIX FORMAT: wFormatTag=" << pwfx->wFormatTag
+              << " nChannels=" << pwfx->nChannels
+              << " nSamplesPerSec=" << pwfx->nSamplesPerSec
+              << " wBitsPerSample=" << pwfx->wBitsPerSample
+              << " nBlockAlign=" << pwfx->nBlockAlign
+              << " nAvgBytesPerSec=" << pwfx->nAvgBytesPerSec
+              << std::endl;
+
+    // If the device provided WAVE_FORMAT_EXTENSIBLE, print extra fields
+    if (pwfx->wFormatTag == WAVE_FORMAT_EXTENSIBLE) {
+        WAVEFORMATEXTENSIBLE* pwfe = reinterpret_cast<WAVEFORMATEXTENSIBLE*>(pwfx);
+        std::cout << "WAVE_FORMAT_EXTENSIBLE: dwChannelMask=0x" << std::hex << pwfe->dwChannelMask << std::dec << std::endl;
+        // print SubFormat GUID first 4 bytes for quick identification
+        const unsigned char* guid = reinterpret_cast<const unsigned char*>(&pwfe->SubFormat);
+        std::cout << "SubFormat GUID prefix: "
+                  << std::hex << (int)guid[0] << " " << (int)guid[1] << " " << (int)guid[2] << " " << (int)guid[3] << std::dec << std::endl;
     }
 
     // prefer float32, but accept what the device gives
