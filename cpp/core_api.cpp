@@ -127,3 +127,8 @@ fp_result_t fp_stop_stream(void)
     g_user_ptr = nullptr;
     return FP_OK;
 }
+
+fp_result_t fp_get_effective_sample_rate(void)
+{
+    return g_sample_rate;
+}

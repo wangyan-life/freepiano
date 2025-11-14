@@ -11,6 +11,8 @@ internal static class Native
     public static extern int fp_init();
     [DllImport("freepiano_minimal.dll", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
     public static extern int fp_open_default_device(int sampleRate, int channels, int framesPerBuffer);
+        [DllImport("freepiano_minimal.dll", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
+        public static extern int fp_get_effective_sample_rate();
     [DllImport("freepiano_minimal.dll", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
     public static extern int fp_start_stream(IntPtr cb, IntPtr user);
     [DllImport("freepiano_minimal.dll", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
@@ -23,11 +25,14 @@ class Program
     // keep delegate alive
     static Native.AudioCallback? callback;
     static double _phase = 0.0;
+    static int synthSampleRate = 44100;
 
     static void SineCallback(IntPtr interleavedPtr, UIntPtr frames, IntPtr user)
     {
     int ch = 2;
-    int sampleRate = 44100; // match common device mix format and recorded WAV
+    int sampleRate = synthSampleRate; // default
+        // if native returned an effective sample rate, use it
+        // note: synthSampleRate variable is set in Main and used by callback
     double freq = 440.0;
         int frameCount = (int)frames;
 
@@ -54,7 +59,10 @@ class Program
     {
         Console.WriteLine("WasapiDemo starting");
         Native.fp_init();
-        Native.fp_open_default_device(48000, 2, 256);
+        // request driver choose the best mix format (pass 0) and then query effective sample rate
+        Native.fp_open_default_device(0, 2, 256);
+    int effective = Native.fp_get_effective_sample_rate();
+    synthSampleRate = (effective > 0) ? effective : 44100;
 
     callback = new Native.AudioCallback(SineCallback);
     IntPtr fp = Marshal.GetFunctionPointerForDelegate(callback);

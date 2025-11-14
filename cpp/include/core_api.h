@@ -50,6 +50,9 @@ FP_API fp_result_t fp_close_device(void);
 FP_API fp_result_t fp_start_stream(fp_audio_callback_t cb, void* user);
 FP_API fp_result_t fp_stop_stream(void);
 
+/* Query the effective sample rate the core/driver is using (0 if none) */
+FP_API int fp_get_effective_sample_rate(void);
+
 #ifdef __cplusplus
 }
 #endif
