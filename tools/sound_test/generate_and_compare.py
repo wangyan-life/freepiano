@@ -36,7 +36,24 @@ def read_mono(path):
     sr, data = wavfile.read(path)
     if data.ndim > 1:
         data = data.mean(axis=1)
-    return sr, data.astype(np.float64)
+    dtype = data.dtype
+    data_f = data.astype(np.float64)
+    # normalize according to dtype
+    if np.issubdtype(dtype, np.integer):
+        # figure bits
+        bits = data.dtype.itemsize * 8
+        if bits == 16:
+            data_f = data_f / 32767.0
+        elif bits == 32:
+            # signed 32-bit PCM
+            data_f = data_f / 2147483647.0
+        else:
+            # fallback
+            data_f = data_f / float(2**(bits-1)-1)
+    elif np.issubdtype(dtype, np.floating):
+        # float32/64 assumed already in -1..1
+        data_f = data_f.astype(np.float64)
+    return sr, data_f
 
 def spectrum_plot(x, sr, out_png, title=None):
     N = len(x)
