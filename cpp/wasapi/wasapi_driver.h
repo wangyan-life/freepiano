@@ -19,6 +19,8 @@ public:
 
     bool open(int sampleRate, int channels, int framesPerBuffer);
     void close();
+    // Query the device's mix sample rate synchronously (0 on error)
+    int query_mix_sample_rate();
     bool start(fp_audio_callback_t cb, void* user);
     void stop();
 

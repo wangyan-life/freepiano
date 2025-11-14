@@ -30,6 +30,38 @@ bool WasapiDriver::open(int sampleRate, int channels, int framesPerBuffer)
     return true;
 }
 
+int WasapiDriver::query_mix_sample_rate()
+{
+    HRESULT hr = CoInitializeEx(NULL, COINIT_MULTITHREADED);
+    if (FAILED(hr)) return 0;
+
+    int result = 0;
+    IMMDeviceEnumerator* enumerator = nullptr;
+    hr = CoCreateInstance(__uuidof(MMDeviceEnumerator), nullptr, CLSCTX_ALL, IID_PPV_ARGS(&enumerator));
+    if (SUCCEEDED(hr)) {
+        IMMDevice* device = nullptr;
+        hr = enumerator->GetDefaultAudioEndpoint(eRender, eConsole, &device);
+        if (SUCCEEDED(hr)) {
+            IAudioClient* audioClient = nullptr;
+            hr = device->Activate(__uuidof(IAudioClient), CLSCTX_ALL, NULL, (void**)&audioClient);
+            if (SUCCEEDED(hr)) {
+                WAVEFORMATEX* pwfx = nullptr;
+                hr = audioClient->GetMixFormat(&pwfx);
+                if (SUCCEEDED(hr) && pwfx) {
+                    result = static_cast<int>(pwfx->nSamplesPerSec);
+                    CoTaskMemFree(pwfx);
+                }
+                audioClient->Release();
+            }
+            device->Release();
+        }
+        enumerator->Release();
+    }
+
+    CoUninitialize();
+    return result;
+}
+
 void WasapiDriver::close()
 {
     // nothing to do in minimal skeleton

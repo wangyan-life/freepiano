@@ -45,6 +45,13 @@ fp_result_t fp_open_default_device(int sample_rate, int channels, int frames_per
         return FP_ERR_DEVICE;
     }
 
+    // Query device mix sample rate and align producer sample rate to avoid hardcoding mismatches
+    int device_sr = g_driver->query_mix_sample_rate();
+    if (device_sr > 0 && device_sr != g_sample_rate) {
+        // set producer/sample scheduling to the device rate
+        g_sample_rate = device_sr;
+    }
+
     // allocate ring: store floats; capacity = power-of-two number of samples
     size_t capacity = 1u << 16; // 65536 samples
     g_ring.reset(new SpscRing<float>(capacity));
