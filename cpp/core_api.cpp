@@ -128,7 +128,7 @@ fp_result_t fp_stop_stream(void)
     return FP_OK;
 }
 
-fp_result_t fp_get_effective_sample_rate(void)
+int fp_get_effective_sample_rate(void)
 {
     return g_sample_rate;
 }
